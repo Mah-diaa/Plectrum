@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Text, View, FlatList, TouchableOpacity, Dimensions } from "react-native";
+import { WebView } from "react-native-webview";
 import "../global.css";
 import { ALL_CHORDS } from "@/src/types/chord";
 import { RootNote, ChordType, ALL_ROOT_NOTES, ALL_CHORD_TYPES } from "@/src/types/types";
+import { formatChordForAPI, generateChordHTML } from "@/src/utils/chordFormatter";
 
 const screenWidth = Dimensions.get('window').width;
 const itemWidth = screenWidth / 4; // Show 4 items at a time
@@ -15,6 +17,12 @@ export default function App() {
   const selectedChord = ALL_CHORDS.find(
     (chord) => chord.root === selectedRoot && chord.type === selectedType
   );
+
+  // Format chord name for API and generate HTML
+  const chordNameForAPI = selectedChord 
+    ? formatChordForAPI(selectedRoot, selectedType)
+    : 'C';
+  const chordHTML = generateChordHTML(chordNameForAPI);
 
   const renderRootButton = ({ item }: { item: RootNote }) => (
     <TouchableOpacity
@@ -94,11 +102,25 @@ export default function App() {
         />
       </View>
 
-      {/* Display Area - for future chord diagram */}
-      <View className="flex-1 items-center justify-center bg-eclipse-dark">
-        <Text className="text-lg text-eclipse-lavender">
-          Chord diagram will go here
-        </Text>
+      {/* Display Area - Chord Diagram */}
+      <View className="flex-1 bg-eclipse-dark">
+        {selectedChord ? (
+          <WebView
+            source={{ html: chordHTML }}
+            style={{ backgroundColor: 'transparent', flex: 1 }}
+            scalesPageToFit={true}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            bounces={false}
+            scrollEnabled={false}
+          />
+        ) : (
+          <View className="flex-1 items-center justify-center">
+            <Text className="text-lg text-eclipse-lavender">
+              Select a chord to see diagram
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );
