@@ -2,20 +2,46 @@
 // Examples: "C Major" -> "C", "C Minor" -> "Cm", "C 7" -> "C7"
 
 export function formatChordForAPI(root: string, type: string): string {
-  // Map chord types to API format
+  // Map chord types to scales-chords API format
+  // Only includes chord types supported by the API
   const typeMap: Record<string, string> = {
+    // Basic triads
     'Major': '',           // C Major -> C
     'Minor': 'm',          // C Minor -> Cm
-    '7': '7',              // C 7 -> C7
     '5': '5',              // C 5 -> C5
     'dim': 'dim',          // C dim -> Cdim
-    'dim7': 'dim7',        // C dim7 -> Cdim7
     'aug': 'aug',          // C aug -> Caug
+    // Suspended
     'sus2': 'sus2',        // C sus2 -> Csus2
     'sus4': 'sus4',        // C sus4 -> Csus4
+    // Sixth chords
+    '6': '6',              // C 6 -> C6
+    'm6': 'm6',            // C m6 -> Cm6
+    '6add9': '6/9',        // C 6add9 -> C6/9 (API uses 6/9 format)
+    // Seventh chords
+    '7': '7',              // C 7 -> C7
     'maj7': 'maj7',        // C maj7 -> Cmaj7
     'm7': 'm7',            // C m7 -> Cm7
+    'dim7': 'dim7',        // C dim7 -> Cdim7
+    '7sus2': '7sus2',      // C 7sus2 -> C7sus2
     '7sus4': '7sus4',      // C 7sus4 -> C7sus4
+    'm7b5': 'm7b5',        // C m7b5 -> Cm7b5
+    '7b5': '7b5',          // C 7b5 -> C7b5
+    '7#5': '7#5',          // C 7#5 -> C7#5
+    'mmaj7': 'mmaj7',      // C mmaj7 -> Cmmaj7
+    // Extended (9ths)
+    'maj9': 'maj9',        // C maj9 -> Cmaj9
+    'm9': 'm9',            // C m9 -> Cm9
+    '9': '9',              // C 9 -> C9
+    '9b5': '9b5',          // C 9b5 -> C9b5
+    '9#5': '9#5',          // C 9#5 -> C9#5
+    '9sus2': '9sus2',      // C 9sus2 -> C9sus2
+    '9sus4': '9sus4',      // C 9sus4 -> C9sus4
+    // Extended (11ths)
+    'm11': 'm11',          // C m11 -> Cm11
+    // Extended (13ths)
+    'm13': 'm13',          // C m13 -> Cm13
+    '13': '13',            // C 13 -> C13
   };
   
   const typeSuffix = typeMap[type] || '';

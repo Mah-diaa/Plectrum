@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C Chord API Test - All Chord Types</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        .stats {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border-radius: 5px;
+        }
+        .chord-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .chord-card {
+            background-color: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 200px;
+        }
+        .chord-card.working {
+            border-color: #4CAF50;
+        }
+        .chord-card.error {
+            border-color: #f44336;
+        }
+        .chord-card.loading {
+            border-color: #ff9800;
+        }
+        .chord-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+        .chord-api-name {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+        .chord-diagram {
+            min-height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1a1a1a;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .chord-diagram img,
+        .chord-diagram svg,
+        .chord-diagram canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        .error-message {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-working {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .status-error {
+            background-color: #f44336;
+            color: white;
+        }
+        .status-loading {
+            background-color: #ff9800;
+            color: white;
+        }
+        .filter-controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            margin: 5px;
+            background-color: #444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .filter-btn.active {
+            background-color: #4CAF50;
+        }
+        .filter-btn:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎸 C Chord API Test - All Chord Types</h1>
+    
+    <div class="stats">
+        <div>Total Chords: <span id="total-count">0</span></div>
+        <div>Working: <span id="working-count" style="color: #4CAF50;">0</span> | 
+             Errors: <span id="error-count" style="color: #f44336;">0</span> | 
+             Loading: <span id="loading-count" style="color: #ff9800;">0</span>
+        </div>
+    </div>
+
+    <div class="filter-controls">
+        <button class="filter-btn active" onclick="filterChords('all')">All</button>
+        <button class="filter-btn" onclick="filterChords('working')">Working</button>
+        <button class="filter-btn" onclick="filterChords('error')">Errors</button>
+        <button class="filter-btn" onclick="filterChords('loading')">Loading</button>
+    </div>
+
+    <div class="chord-grid" id="chord-grid">
+        <!-- Chords will be generated here before script loads -->
+    </div>
+
+    <script>
+        // Map chord types to API format (same as formatChordForAPI)
+        // Only includes chord types supported by scales-chords.com API
+        const typeMap = {
+            // Basic triads
+            'Major': '',
+            'Minor': 'm',
+            '5': '5',
+            'dim': 'dim',
+            'aug': 'aug',
+            // Suspended
+            'sus2': 'sus2',
+            'sus4': 'sus4',
+            // Sixth chords
+            '6': '6',
+            'm6': 'm6',
+            '6add9': '6/9',  // API uses 6/9 format
+            // Seventh chords
+            '7': '7',
+            'maj7': 'maj7',
+            'm7': 'm7',
+            'dim7': 'dim7',
+            '7sus2': '7sus2',
+            '7sus4': '7sus4',
+            'm7b5': 'm7b5',
+            '7b5': '7b5',
+            '7#5': '7#5',
+            'mmaj7': 'mmaj7',
+            // Extended (9ths)
+            'maj9': 'maj9',
+            'm9': 'm9',
+            '9': '9',
+            '9b5': '9b5',
+            '9#5': '9#5',
+            '9sus2': '9sus2',
+            '9sus4': '9sus4',
+            // Extended (11ths)
+            'm11': 'm11',
+            // Extended (13ths)
+            'm13': 'm13',
+            '13': '13',
+            '13#11': '13#11',
+        };
+
+        // All chord types supported by scales-chords.com API
+        const chordTypes = [
+            // Basic triads
+            'Major', 'Minor', '5', 'dim', 'aug',
+            // Suspended
+            'sus2', 'sus4',
+            // Sixth chords
+            '6', 'm6', '6add9',
+            // Seventh chords
+            '7', 'maj7', 'm7', 'dim7', '7sus2', '7sus4', 'm7b5', '7b5', '7#5', 'mmaj7',
+            // Extended (9ths)
+            'maj9', 'm9', '9', '9b5', '9#5', '9sus2', '9sus4',
+            // Extended (11ths)
+            'm11',
+            // Extended (13ths)
+            'm13', '13',
+        ];
+
+        function formatChordForAPI(root, type) {
+            const typeSuffix = typeMap[type] || '';
+            return `${root}${typeSuffix}`;
+        }
+
+        // Generate all chord cards in HTML BEFORE the API script loads
+        function generateChordHTML() {
+            const root = 'C';
+            const grid = document.getElementById('chord-grid');
+            let html = '';
+
+            chordTypes.forEach(type => {
+                const apiName = formatChordForAPI(root, type);
+                const displayName = type === 'Major' ? root : `${root} ${type}`;
+                const safeId = type.replace(/[^a-zA-Z0-9]/g, '-');
+
+                html += `
+                    <div class="chord-card loading" data-type="${type}" data-status="loading" id="card-${safeId}">
+                        <div class="chord-name">
+                            ${displayName} <span class="status-badge status-loading">Loading</span>
+                        </div>
+                        <div class="chord-api-name">API: "${apiName}"</div>
+                        <div class="chord-diagram" id="diagram-${safeId}">
+                            <ins class="scales_chords_api" chord="${apiName}"></ins>
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        const chordStates = {
+            working: 0,
+            error: 0,
+            loading: chordTypes.length
+        };
+
+        function updateStats() {
+            document.getElementById('total-count').textContent = chordTypes.length;
+            document.getElementById('working-count').textContent = chordStates.working;
+            document.getElementById('error-count').textContent = chordStates.error;
+            document.getElementById('loading-count').textContent = chordStates.loading;
+        }
+
+        function checkAllChords() {
+            // Check all chords after API has had time to load
+            setTimeout(() => {
+                chordTypes.forEach(type => {
+                    const safeId = type.replace(/[^a-zA-Z0-9]/g, '-');
+                    const card = document.getElementById(`card-${safeId}`);
+                    const diagramDiv = document.getElementById(`diagram-${safeId}`);
+                    
+                    if (!card || !diagramDiv) return;
+
+                    const hasContent = diagramDiv.querySelector('img, svg, canvas, table') !== null;
+                    const isEmpty = diagramDiv.innerHTML.trim() === '' || 
+                                   diagramDiv.innerHTML.includes('undefined') ||
+                                   diagramDiv.textContent.includes('undefined');
+
+                    if (hasContent && !isEmpty) {
+                        // Working!
+                        card.className = 'chord-card working';
+                        card.dataset.status = 'working';
+                        card.querySelector('.status-badge').className = 'status-badge status-working';
+                        card.querySelector('.status-badge').textContent = '✓ Working';
+                        chordStates.working++;
+                        chordStates.loading--;
+                    } else {
+                        // Error
+                        card.className = 'chord-card error';
+                        card.dataset.status = 'error';
+                        card.querySelector('.status-badge').className = 'status-badge status-error';
+                        card.querySelector('.status-badge').textContent = '✗ Error';
+                        
+                        const errorMsg = document.createElement('div');
+                        errorMsg.className = 'error-message';
+                        errorMsg.textContent = 'No diagram loaded';
+                        card.appendChild(errorMsg);
+                        
+                        chordStates.error++;
+                        chordStates.loading--;
+                    }
+                });
+                updateStats();
+            }, 3000); // Wait 3 seconds for API to fully load
+        }
+
+        function filterChords(filter) {
+            const cards = document.querySelectorAll('.chord-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            cards.forEach(card => {
+                if (filter === 'all') {
+                    card.style.display = '';
+                } else {
+                    card.style.display = card.dataset.status === filter ? '' : 'none';
+                }
+            });
+        }
+
+        // Generate HTML immediately (before API script loads)
+        generateChordHTML();
+        updateStats();
+
+        // Load API script AFTER all HTML elements are generated
+        const apiScript = document.createElement('script');
+        apiScript.type = 'text/javascript';
+        apiScript.src = 'https://www.scales-chords.com/api/scales-chords-api.js';
+        apiScript.async = true;
+        document.body.appendChild(apiScript);
+
+        // Check chords after API script loads
+        apiScript.onload = () => {
+            // Give API a moment to process all elements
+            setTimeout(() => {
+                checkAllChords();
+            }, 2000);
+        };
+
+        // Fallback: check after page loads if script already loaded
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                checkAllChords();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
+
