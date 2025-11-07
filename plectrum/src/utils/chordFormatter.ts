@@ -7,7 +7,7 @@ export function formatChordForAPI(root: string, type: string): string {
   const typeMap: Record<string, string> = {
     // Basic triads
     'Major': '',           // C Major -> C
-    'Minor': 'm',          // C Minor -> Cm
+    'Minor': ' m',          // C Minor -> Cm
     '5': '5',              // C 5 -> C5
     'dim': 'dim',          // C dim -> Cdim
     'aug': 'aug',          // C aug -> Caug
@@ -61,7 +61,7 @@ export function generateChordHTML(chordName: string): string {
         }
         body {
           margin: 0;
-          padding: 10px;
+          padding: 0;
           background-color: #0F0E47;
           display: flex;
           justify-content: center;
@@ -75,6 +75,8 @@ export function generateChordHTML(chordName: string): string {
           align-items: center;
           width: 100%;
           max-width: 100vw;
+          padding: 0;
+          margin: 0;
         }
         /* Target all images and SVGs injected by the API */
         img, svg, canvas {
