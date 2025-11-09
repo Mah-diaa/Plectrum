@@ -7,7 +7,6 @@ export function useMetronome(initialBpm: number = 120) {
   const [tickCount, setTickCount] = useState(0);
   const metronomeRef = useRef<Metronome | null>(null);
 
-  // Initialize metronome
   useEffect(() => {
     metronomeRef.current = new Metronome(bpm, () => {
       setTickCount(prev => prev + 1);
@@ -17,12 +16,10 @@ export function useMetronome(initialBpm: number = 120) {
     };
   }, []);
 
-  // Update metronome BPM
   useEffect(() => {
     if (metronomeRef.current) {
       const wasRunning = metronomeRef.current.getIsRunning();
       metronomeRef.current.setBPM(bpm).then(() => {
-        // Restart if it was running
         if (wasRunning && !metronomeRef.current?.getIsRunning()) {
           metronomeRef.current?.start().then(() => {
             setIsRunning(true);

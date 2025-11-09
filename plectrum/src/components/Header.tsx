@@ -38,7 +38,6 @@ export function Header({
 
   return (
     <View className="pt-20 pb-6 px-4 bg-eclipse-indigo relative">
-      {/* Metronome Button - Top Left */}
       <TouchableOpacity
         onPress={onMetronomePress}
         className="absolute top-20 left-4 w-10 h-10 items-center justify-center rounded-full bg-eclipse-purple z-10"

@@ -21,7 +21,6 @@ import "../global.css";
 type ViewMode = 'chords' | 'keys' | 'progressions';
 
 export default function App() {
-  // State
   const [selectedRoot, setSelectedRoot] = useState<RootNote>('C');
   const [selectedType, setSelectedType] = useState<ChordType>('Major');
   const [viewMode, setViewMode] = useState<ViewMode>('chords');
@@ -31,10 +30,8 @@ export default function App() {
   const [currentProgression, setCurrentProgression] = useState<Chord[]>([]);
   const [showAllChords, setShowAllChords] = useState(false);
 
-  // Metronome hook
   const metronome = useMetronome(120);
 
-  // Computed values
   const allKeys = createAllMajorKeys();
   const selectedKey = getKeyByRoot(selectedKeyRoot);
   const selectedChord = ALL_CHORDS.find(
@@ -45,15 +42,12 @@ export default function App() {
     : 'C';
   const chordHTML = generateChordHTML(chordNameForAPI);
 
-  // Generate progression when key or pattern changes
   useEffect(() => {
     if (selectedKey && viewMode === 'progressions') {
       const progression = generateProgression(selectedKey, progressionPattern, 4);
       setCurrentProgression(progression);
     }
   }, [selectedKeyRoot, progressionPattern, viewMode, selectedKey]);
-
-  // Handlers
   const handleCloseMetronome = async () => {
     setMetronomeVisible(false);
     await metronome.stop();
@@ -68,7 +62,6 @@ export default function App() {
 
   return (
     <View className="flex-1 bg-eclipse-dark">
-      {/* Header */}
       <Header
         viewMode={viewMode}
         selectedChordName={selectedChord?.name}
@@ -80,7 +73,6 @@ export default function App() {
         onMetronomePress={() => setMetronomeVisible(prev => !prev)}
       />
 
-      {/* Chord View */}
       {viewMode === 'chords' && (
         <>
           <RootNoteSelector
@@ -100,7 +92,6 @@ export default function App() {
         </>
       )}
 
-      {/* Keys/Progressions View */}
       {(viewMode === 'keys' || viewMode === 'progressions') && (
         <>
           <KeySelector
@@ -114,7 +105,6 @@ export default function App() {
         </>
       )}
 
-      {/* Progression Pattern Selector */}
       {viewMode === 'progressions' && (
         <ProgressionSelector
           selectedPattern={progressionPattern}
@@ -123,7 +113,6 @@ export default function App() {
         />
       )}
 
-      {/* Display Area */}
       <View className="flex-1 bg-eclipse-dark">
         {viewMode === 'chords' && (
           <ChordDisplay chordHTML={chordHTML} />
@@ -144,7 +133,6 @@ export default function App() {
         )}
       </View>
 
-      {/* Metronome Popup */}
       <MetronomePopup
         visible={metronomeVisible}
         bpm={metronome.bpm}

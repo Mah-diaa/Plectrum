@@ -29,31 +29,43 @@ export function ProgressionDisplay({ pattern, progression }: ProgressionDisplayP
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
-        <Text className="text-xl font-bold text-white mb-4 text-center">
+        <Text className="text-xl font-bold text-white mb-1 text-center">
           {pattern === 'random' ? 'Random' : pattern} Progression
         </Text>
         
-        {/* Chord Buttons */}
-        <View className="mb-4">
-          <View className="flex-row flex-wrap justify-center gap-3">
+        <View className="mb-0">
+          <View className="flex-row flex-wrap justify-center gap-2">
             {progression.map((chord, index) => (
               <TouchableOpacity
                 key={index}
                 onPress={() => setSelectedChordIndex(selectedChordIndex === index ? null : index)}
-                className={`px-6 py-4 rounded-lg min-w-[80px] items-center ${
+                className={`px-4 py-3 rounded-lg items-center justify-center ${
                   selectedChordIndex === index ? 'bg-eclipse-indigo' : 'bg-eclipse-purple'
                 }`}
+                style={{ minWidth: 70, maxWidth: 100 }}
               >
-                <Text className="text-white text-2xl font-bold">{chord.name}</Text>
-                <Text className="text-eclipse-lavender text-xs mt-1">{chord.root} {chord.type}</Text>
+                <Text 
+                  className="text-white font-bold text-center" 
+                  style={{ fontSize: 18 }}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  minimumFontScale={0.7}
+                >
+                  {chord.name}
+                </Text>
+                <Text 
+                  className="text-eclipse-lavender text-xs mt-1 text-center" 
+                  numberOfLines={1}
+                >
+                  {chord.root} {chord.type}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
-        {/* Chord Diagram Display */}
         {selectedChord && chordHTML && (
-          <View className="flex-1 min-h-[400px] bg-eclipse-dark rounded-lg overflow-hidden">
+          <View className="w-full mt-0" style={{ height: 400 }}>
             <WebView
               source={{ html: chordHTML }}
               style={{ backgroundColor: 'transparent', flex: 1 }}

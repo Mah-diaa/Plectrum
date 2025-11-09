@@ -1,4 +1,4 @@
-import { Key, Chord } from "../types/types";
+import { Chord, Key } from "../types/types";
 
 const cMajorChord: Chord = {
   name: "C",
@@ -58,8 +58,6 @@ const fSharpDiminishedChord: Chord = {
   type: "Diminished",
 };
 
-// Now create the C Major Key object
-// Notice: chords is an array of Chord objects
 const cMajor: Key = {
   root: "C",
   type: "Major",
@@ -87,5 +85,5 @@ const gMajor: Key = {
     fSharpDiminishedChord,
   ],
 };
-// Export an array of all keys (for now, just C Major)
+
 export const keys: Key[] = [cMajor, gMajor];

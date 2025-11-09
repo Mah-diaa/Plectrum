@@ -33,10 +33,6 @@ export function MetronomePopup({
         elevation: 8,
       }}
     >
-      {/* Speech bubble tail */}
-      {/* <View className="absolute -top-2 right-6 w-4 h-4 bg-eclipse-dark rotate-45" /> */}
-
-      {/* Popup content */}
       <View className="bg-eclipse-dark rounded-2xl p-4 w-72 border-2 border-eclipse-purple">
         <View className="flex-row justify-between items-center mb-4">
           <Text className="text-lg font-bold text-white">Metronome</Text>
@@ -48,7 +44,6 @@ export function MetronomePopup({
           </TouchableOpacity>
         </View>
 
-        {/* BPM Display */}
         <View className="items-center mb-4">
           <Text
             className={`text-5xl font-bold mb-1 ${isRunning ? "text-eclipse-indigo" : "text-white"}`}
@@ -58,7 +53,6 @@ export function MetronomePopup({
           <Text className="text-eclipse-lavender text-xs">BPM</Text>
         </View>
 
-        {/* BPM Controls */}
         <View className="flex-row justify-center items-center mb-4 gap-2">
           <TouchableOpacity
             onPress={() => onBpmChange(Math.max(40, bpm - 5))}
@@ -86,7 +80,6 @@ export function MetronomePopup({
           </TouchableOpacity>
         </View>
 
-        {/* Start/Stop Button */}
         <TouchableOpacity
           onPress={onToggle}
           className={`py-3 rounded-lg ${isRunning ? "bg-red-600" : "bg-eclipse-indigo"}`}
@@ -96,7 +89,6 @@ export function MetronomePopup({
           </Text>
         </TouchableOpacity>
 
-        {/* Tick Counter with Visual Indicator */}
         {isRunning && (
           <View className="items-center mt-3">
             <View

@@ -4,7 +4,6 @@ export type Chord = {
   name: string;
   root: string;
   type: string;
-  // fretting: number[];
 };
 
 export function createAllChords(): Chord[] {
